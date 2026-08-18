@@ -36,6 +36,18 @@ def add_task(title):
     print(f"已添加任务：{title}")
 
 
+def complete_task(task_number):
+    tasks = load_tasks()
+    if task_number < 1 or task_number > len(tasks):
+        print(f"任务编号不存在：{task_number}")
+        return
+
+    task = tasks[task_number - 1]
+    task["done"] = True
+    save_tasks(tasks)
+    print(f"已完成任务：{task.get('title', '未命名任务')}")
+
+
 def list_tasks():
     tasks = load_tasks()
     if not tasks:
@@ -44,7 +56,7 @@ def list_tasks():
 
     for index, task in enumerate(tasks, start=1):
         status = "x" if task.get("done") else " "
-        print(f"{index}. [{status}] {task.get('title', '未命名任务')}")
+        print(f"[{status}] {index}. {task.get('title', '未命名任务')}")
 
 
 def build_parser():
@@ -54,6 +66,9 @@ def build_parser():
     add_parser = subparsers.add_parser("add", help="添加一条任务")
     add_parser.add_argument("title", help="任务内容")
     subparsers.add_parser("list", help="查看全部任务")
+
+    done_parser = subparsers.add_parser("done", help="将任务标记为已完成")
+    done_parser.add_argument("number", type=int, help="任务编号")
     return parser
 
 
@@ -63,6 +78,8 @@ def main():
         add_task(args.title)
     elif args.command == "list":
         list_tasks()
+    elif args.command == "done":
+        complete_task(args.number)
 
 
 if __name__ == "__main__":
